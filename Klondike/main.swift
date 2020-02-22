@@ -115,3 +115,29 @@ print("pile 2: \(pile2)")
 print("pile 3: \(pile3)")
 print("pile 4: \(pile4)")
 print("sorted in \(loops) loops")
+
+
+
+/*
+    Below, I wanted to see what the best and worst sorts would be in 1000 playthroughs
+ */
+
+var output = [Int]()
+
+for _ in 1...1000 {
+    pile1 = []
+    pile2 = []
+    pile3 = []
+    pile4 = []
+    discardPile = []
+
+    shuffledDeck = buildShuffledDeck()
+    shouldCheckDiscard = false
+    loops = 0
+    
+    play(with: shuffledDeck)
+    output.append(loops)
+}
+
+output.sort()
+print("shortest run: \(output.first!)\nlongest run: \(output.last!)")
