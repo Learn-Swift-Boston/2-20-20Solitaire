@@ -38,7 +38,14 @@ func buildShuffledDeck() -> [Card] {
         }
     }
 
-    return deck.shuffled().shuffled().shuffled()
+    return deck.shuffled()
+}
+
+func isStackable(stackCard: Card?, drawCard: Card) -> Bool {
+    let result = (drawCard.rank == .ace && stackCard == nil) ||
+        (stackCard?.suit == drawCard.suit && stackCard?.rank.rawValue == drawCard.rank.rawValue - 1)
+    
+    return result
 }
 
 var pile1: [Card] = []
@@ -47,37 +54,56 @@ var pile3: [Card] = []
 var pile4: [Card] = []
 var discardPile: [Card] = []
 
-var deck = buildShuffledDeck()
+var shuffledDeck = buildShuffledDeck()
+var shouldCheckDiscard = false
+var loops = 0
 
-func stack(card: Card) -> Bool {
-
+func stack(card: Card) {
     if isStackable(stackCard: pile1.last, drawCard: card) {
         pile1.append(card)
-        return true
+        shouldCheckDiscard = true
     } else if isStackable(stackCard: pile2.last, drawCard: card) {
         pile2.append(card)
-        return true
+        shouldCheckDiscard = true
     } else if isStackable(stackCard: pile3.last, drawCard: card) {
         pile3.append(card)
-        return true
+        shouldCheckDiscard = true
     } else if isStackable(stackCard: pile4.last, drawCard: card) {
         pile4.append(card)
-        return true
+        shouldCheckDiscard = true
     } else {
-        return false
+        discardPile.append(card)
+        shouldCheckDiscard = false
     }
 }
 
-// set up the intial state
-discardPile.append(deck.popLast()!)
-
-while !stack(card: discardPile.last!) {
-    discardPile.append(deck.popLast()!)
+func play(with deck: [Card]) {
+    var deck = deck
+    while deck.count > 0 {
+        loops += 1
+        
+        if shouldCheckDiscard, let card = discardPile.popLast() {
+            stack(card: card)
+            continue
+        }
+        
+        guard let card = deck.popLast() else { break }
+        
+        stack(card: card)
+    }
+    
+    if discardPile.count > 0 {
+        deck = discardPile
+        discardPile = [Card]()
+        play(with: deck)
+    }
 }
 
+play(with: shuffledDeck)
+
+print("deck: \(shuffledDeck)")
 print("pile 1: \(pile1)")
 print("pile 2: \(pile2)")
 print("pile 3: \(pile3)")
 print("pile 4: \(pile4)")
-print("discard: \(discardPile)")
-print("deck: \(deck)")
+print("sorted in \(loops) loops")
