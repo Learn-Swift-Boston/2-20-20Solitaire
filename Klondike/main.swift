@@ -8,24 +8,32 @@
 
 import Foundation
 
-enum Suit: CaseIterable {
+enum Suit: String, CaseIterable {
     case spades, clubs, hearts, diamonds
+    
+    var character: String {
+        switch self {
+        case .clubs:
+            return "♣️"
+        case .spades:
+            return "♠️"
+        case .hearts:
+            return "♥️"
+        case.diamonds:
+            return "♦️"
+        }
+    }
 }
 
 enum Rank: Int, CaseIterable {
     case ace = 1, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king
 }
 
-struct Card {
+struct Card: CustomDebugStringConvertible {
     let rank: Rank
     let suit: Suit
-}
-
-func isStackable(stackCard: Card?, drawCard: Card) -> Bool {
-    let result = (drawCard.rank == .ace && stackCard == nil) ||
-        (stackCard?.suit == drawCard.suit &&
-         stackCard?.rank.rawValue == drawCard.rank.rawValue - 1)
-    return result
+    
+    var debugDescription: String { "\(rank.rawValue)\(suit.character)" }
 }
 
 func buildShuffledDeck() -> [Card] {
